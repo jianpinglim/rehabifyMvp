@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyboard Event Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #output { margin-top: 20px; font-size: 18px; }
+        #keyStatus { margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Keyboard Event Test</h1>
+    <input type="text" id="testInput" placeholder="Key presses will appear here">
+    <div id="output"></div>
+    <div id="keyStatus"></div>
+
+    <script>
+        const testInput = document.getElementById('testInput');
+        const output = document.getElementById('output');
+        const keyStatus = document.getElementById('keyStatus');
+        const heldKeys = {};
+
+        function pressKey(key) {
+            if (!heldKeys[key]) {
+                const event = new KeyboardEvent('keydown', {
+                    key: key,
+                    code: 'Key' + key.toUpperCase(),
+                    which: key.charCodeAt(0),
+                    bubbles: true,
+                    cancelable: true
+                });
+                document.dispatchEvent(event);
+                heldKeys[key] = true;
+                updateKeyStatus();
+            }
+        }
+
+        function releaseKey(key) {
+            if (heldKeys[key]) {
+                const event = new KeyboardEvent('keyup', {
+                    key: key,
+                    code: 'Key' + key.toUpperCase(),
+                    which: key.charCodeAt(0),
+                    bubbles: true,
+                    cancelable: true
+                });
+                document.dispatchEvent(event);
+                heldKeys[key] = false;
+                updateKeyStatus();
+            }
+        }
+
+        function updateKeyStatus() {
+            keyStatus.textContent = 'Held keys: ' + Object.keys(heldKeys).filter(k => heldKeys[k]).join(', ');
+        }
+
+        document.addEventListener('keydown', (e) => {
+            testInput.value += e.key;
+            output.textContent = `Key pressed: ${e.key}`;
+        });
+
+        // Simulate key presses
+        setTimeout(() => pressKey('a'), 1000);
+        setTimeout(() => pressKey('w'), 2000);
+        setTimeout(() => releaseKey('a'), 3000);
+        setTimeout(() => pressKey('s'), 4000);
+        setTimeout(() => releaseKey('w'), 5000);
+        setTimeout(() => pressKey('d'), 6000);
+        setTimeout(() => {
+            releaseKey('s');
+            releaseKey('d');
+        }, 7000);
+    </script>
+</body>
+</html>
